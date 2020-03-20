@@ -10,6 +10,7 @@ import scala.concurrent.ExecutionContext
 import zio._
 import zio.blocking.Blocking
 import zio.interop.catz._
+import zio.logging._
 
 /**
   * Persistence Module for production using Doobie
@@ -17,15 +18,19 @@ import zio.interop.catz._
 final class UserPersistenceService(tnx: Transactor[Task]) extends Persistence.Service[User] {
   import UserPersistenceService._
 
-  def get(id: Int): Task[User] =
-    SQL
-      .get(id)
-      .option
-      .transact(tnx)
-      .foldM(
-        err => Task.fail(err),
-        maybeUser => Task.require(UserNotFound(id))(Task.succeed(maybeUser))
-      )
+  def get(id: Int): ZIO[Logging, Throwable, User] =
+    logLocally(LogAnnotation.Name("UserPersistenceService" :: Nil)) {
+      logInfo(s"Fetching user with id=$id")
+    }.flatMap(_ =>
+      SQL
+        .get(id)
+        .option
+        .transact(tnx)
+        .foldM(
+          err => Task.fail(err),
+          maybeUser => Task.require(UserNotFound(id))(Task.succeed(maybeUser))
+        )
+    )
 
   def create(user: User): Task[User] =
     SQL
@@ -60,7 +65,7 @@ object UserPersistenceService {
       conf: DbConfig,
       connectEC: ExecutionContext,
       transactEC: ExecutionContext
-  ) = {
+  ): ZManaged[Any, Nothing, UserPersistenceService] = {
     import zio.interop.catz._
 
     val xa = H2Transactor
@@ -88,5 +93,4 @@ object UserPersistenceService {
         managed <- mkTransactor(config, connectEC, blockingEC)
       } yield managed
     )
-
 }

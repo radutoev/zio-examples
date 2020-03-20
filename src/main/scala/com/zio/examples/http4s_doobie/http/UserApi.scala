@@ -9,8 +9,9 @@ import zio._
 import org.http4s.circe._
 import zio.interop.catz._
 import io.circe.generic.auto._
+import zio.logging.Logging
 
-final case class Api[R <: UserPersistence](rootUri: String) {
+final case class UserApi[R <: UserPersistence with Logging](rootUri: String) {
 
   type UserTask[A] = RIO[R, A]
 
@@ -24,6 +25,7 @@ final case class Api[R <: UserPersistence](rootUri: String) {
 
     HttpRoutes.of[UserTask] {
       case GET -> Root / IntVar(id) => Ok(getUser(id))
+
       case request @ POST -> Root =>
         request.decode[User] { user =>
           Created(createUser(user))

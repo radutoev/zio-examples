@@ -1,12 +1,12 @@
 name := "zio-examples"
 version := "0.1"
-scalaVersion := "2.12.10"
+scalaVersion := "2.13.1"
 
 val Http4sVersion = "0.21.1"
 val CirceVersion = "0.13.0"
 val DoobieVersion = "0.8.8"
 val ZIOVersion = "1.0.0-RC18-2"
-val PureConfigVersion = "0.11.0"
+val PureConfigVersion = "0.12.3"
 val H2Version = "1.4.199"
 val FlywayVersion = "6.0.0-beta2"
 
@@ -31,7 +31,8 @@ libraryDependencies ++= Seq(
   //h2
   "com.h2database" % "h2" % H2Version,
   // log4j
-  "org.slf4j" % "slf4j-log4j12" % "1.7.26"
+  "dev.zio" %% "zio-logging" % "0.2.4",
+  "dev.zio" %% "zio-logging-slf4j" % "0.2.4"
 )
 
 // for zio snapshot versions
