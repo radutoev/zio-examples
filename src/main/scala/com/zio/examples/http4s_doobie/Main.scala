@@ -16,9 +16,16 @@ import zio.interop.catz._
 import zio.logging.Logging
 import zio.logging.slf4j._
 
+/**
+ * 1. Tapir + Swagger
+ * 2. S3
+ * 3. DynamoDB integration
+ * 4. SQS integration
+ * 5. Unit Tests / Integration Tests.
+ */
+
 object Main extends App {
 
-  //TODO Why AppEnvironment AND layer (see provideSomeLayer)
   type AppEnvironment = Clock with Blocking
     with Logging
     with UserPersistence
