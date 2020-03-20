@@ -6,7 +6,7 @@ import zio.logging.Logging
 package object echo {
   object Echo {
     trait Service {
-      def echo(message: String): ZIO[Logging, Nothing, String] //TODO It is aware of Logging, is it ok?
+      def echo(message: String): ZIO[Logging, Nothing, String]
     }
   }
 }

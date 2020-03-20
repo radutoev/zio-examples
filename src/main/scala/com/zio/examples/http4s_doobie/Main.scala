@@ -5,22 +5,20 @@ import com.zio.examples.http4s_doobie.configuration.ConfigPrd
 import com.zio.examples.http4s_doobie.echo.EchoService
 import com.zio.examples.http4s_doobie.http.{EchoApi, UserApi}
 import com.zio.examples.http4s_doobie.persistence.{UserPersistence, UserPersistenceService}
-import org.http4s.HttpRoutes
 import org.http4s.implicits._
 import org.http4s.server.Router
 import org.http4s.server.blaze.BlazeServerBuilder
-import org.http4s.server.middleware.CORS
 import zio._
 import zio.blocking.Blocking
 import zio.clock.Clock
-import zio.console.{Console, putStrLn}
+import zio.console.putStrLn
 import zio.interop.catz._
-//import zio.interop.catz.implicits._
 import zio.logging.Logging
 import zio.logging.slf4j._
 
 object Main extends App {
 
+  //TODO Why AppEnvironment AND layer (see provideSomeLayer)
   type AppEnvironment = Clock with Blocking with UserPersistence with Logging
 
   type AppTask[A] = RIO[AppEnvironment, A]

@@ -21,6 +21,6 @@ final case class EchoApi[R <: Logging](echoService: Echo.Service) {
   import dsl._
 
   def route: HttpRoutes[EchoTask] = HttpRoutes.of[EchoTask] {
-    case GET -> Root => echoService.echo("TEST").flatMap(echo => Ok(echo))
+    case GET  -> Root / message => echoService.echo(message).flatMap(echo => Ok(echo))
   }
 }
