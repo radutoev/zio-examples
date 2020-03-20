@@ -1,7 +1,5 @@
-package com.zio.examples.http4s_doobie
-package http
+package io.softwarchain.learning.zio.http
 
-import persistence._
 import io.circe.{Decoder, Encoder}
 import org.http4s.{EntityDecoder, EntityEncoder, HttpRoutes}
 import org.http4s.dsl.Http4sDsl
@@ -9,6 +7,8 @@ import zio._
 import org.http4s.circe._
 import zio.interop.catz._
 import io.circe.generic.auto._
+import io.softwarchain.learning.zio.User
+import io.softwarchain.learning.zio.persistence._
 import zio.logging.Logging
 
 final case class UserApi[R <: UserPersistence with Logging](rootUri: String) {

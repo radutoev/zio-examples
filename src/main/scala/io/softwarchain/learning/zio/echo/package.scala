@@ -1,4 +1,4 @@
-package com.zio.examples.http4s_doobie
+package io.softwarchain.learning.zio
 
 import zio.{Has, RIO, ZIO}
 import zio.logging.Logging

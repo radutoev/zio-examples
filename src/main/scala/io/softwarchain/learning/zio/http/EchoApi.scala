@@ -1,7 +1,7 @@
-package com.zio.examples.http4s_doobie.http
+package io.softwarchain.learning.zio.http
 
-import com.zio.examples.http4s_doobie.echo._
 import io.circe.{Decoder, Encoder}
+import io.softwarchain.learning.zio.echo._
 import org.http4s.{EntityDecoder, EntityEncoder, HttpRoutes}
 import org.http4s.dsl.Http4sDsl
 import zio._

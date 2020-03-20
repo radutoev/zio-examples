@@ -1,6 +1,6 @@
-package com.zio.examples.http4s_doobie.persistence
+package io.softwarchain.learning.zio.echo
 
-import com.zio.examples.http4s_doobie.echo._
+import io.softwarchain.learning.zio.echo._
 import zio.ZLayer
 import zio.clock.Clock
 import zio.console.Console

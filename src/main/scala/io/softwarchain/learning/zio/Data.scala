@@ -1,4 +1,4 @@
-package com.zio.examples.http4s_doobie
+package io.softwarchain.learning.zio
 
 final case class User(id: Int, name: String)
 

@@ -1,11 +1,12 @@
-package com.zio.examples.http4s_doobie
-package persistence
+package io.softwarchain.learning.zio.persistence
 
 import cats.effect.Blocker
-import com.zio.examples.http4s_doobie.configuration.{Configuration, DbConfig}
 import doobie.h2.H2Transactor
 import doobie.implicits._
 import doobie.{Query0, Transactor, Update0}
+import io.softwarchain.learning.zio.{User, UserNotFound, configuration}
+import io.softwarchain.learning.zio.configuration.DbConfig
+
 import scala.concurrent.ExecutionContext
 import zio._
 import zio.blocking.Blocking

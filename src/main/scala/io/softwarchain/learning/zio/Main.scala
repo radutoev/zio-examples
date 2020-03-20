@@ -1,10 +1,10 @@
-package com.zio.examples.http4s_doobie
+package io.softwarchain.learning.zio
 
 import cats.effect.ExitCode
-import com.zio.examples.http4s_doobie.configuration.ConfigPrd
-import com.zio.examples.http4s_doobie.echo.{Echo, EchoService}
-import com.zio.examples.http4s_doobie.http.{EchoApi, UserApi}
-import com.zio.examples.http4s_doobie.persistence.{UserPersistence, UserPersistenceService}
+import io.softwarchain.learning.zio.configuration.ConfigPrd
+import io.softwarchain.learning.zio.echo.{Echo, EchoService}
+import io.softwarchain.learning.zio.http.{EchoApi, UserApi}
+import io.softwarchain.learning.zio.persistence.{UserPersistence, UserPersistenceService}
 import org.http4s.implicits._
 import org.http4s.server.Router
 import org.http4s.server.blaze.BlazeServerBuilder

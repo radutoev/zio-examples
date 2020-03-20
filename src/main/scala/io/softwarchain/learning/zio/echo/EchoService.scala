@@ -1,4 +1,4 @@
-package com.zio.examples.http4s_doobie.echo
+package io.softwarchain.learning.zio.echo
 
 import zio.{ZIO, ZLayer}
 import zio.logging.{LogAnnotation, Logging, logInfo, logLocally}

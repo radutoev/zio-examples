@@ -1,4 +1,5 @@
-package com.zio.examples.http4s_doobie.configuration
+package io.softwarchain.learning.zio.configuration
+
 import pureconfig.loadConfigOrThrow
 import zio.{Has, Layer, Task, ZLayer}
 import pureconfig.generic.auto._
