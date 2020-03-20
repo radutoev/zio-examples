@@ -1,6 +1,6 @@
 package com.zio.examples.http4s_doobie
 
-import zio.ZIO
+import zio.{Has, RIO, ZIO}
 import zio.logging.Logging
 
 package object echo {
@@ -9,4 +9,8 @@ package object echo {
       def echo(message: String): ZIO[Logging, Nothing, String]
     }
   }
+
+  type Echo = Has[Echo.Service]
+
+  def echo(message: String): ZIO[Echo with Logging, Nothing, String] = RIO.accessM(_.get.echo(message))
 }

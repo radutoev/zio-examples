@@ -2,7 +2,7 @@ package com.zio.examples.http4s_doobie
 
 import cats.effect.ExitCode
 import com.zio.examples.http4s_doobie.configuration.ConfigPrd
-import com.zio.examples.http4s_doobie.echo.EchoService
+import com.zio.examples.http4s_doobie.echo.{Echo, EchoService}
 import com.zio.examples.http4s_doobie.http.{EchoApi, UserApi}
 import com.zio.examples.http4s_doobie.persistence.{UserPersistence, UserPersistenceService}
 import org.http4s.implicits._
@@ -19,7 +19,10 @@ import zio.logging.slf4j._
 object Main extends App {
 
   //TODO Why AppEnvironment AND layer (see provideSomeLayer)
-  type AppEnvironment = Clock with Blocking with UserPersistence with Logging
+  type AppEnvironment = Clock with Blocking
+    with Logging
+    with UserPersistence
+    with Echo
 
   type AppTask[A] = RIO[AppEnvironment, A]
 
@@ -28,13 +31,15 @@ object Main extends App {
 
   val loggingLayer: ZLayer[Any, Nothing, Logging] = Slf4jLogger.make((_, message) => message)
 
+  val echoLayer: ZLayer[Any, Nothing, Echo] = EchoService.live()
+
   override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] = {
     val program: ZIO[ZEnv, Throwable, Unit] =
       (for {
         api <- configuration.apiConfig
 
         httpApp = Router[AppTask](
-          "/echo" -> EchoApi(new EchoService()).route,
+          "/echo" -> EchoApi().route,
           "/users" -> UserApi(s"${api.endpoint}/users").route
         ).orNotFound
 
@@ -46,7 +51,7 @@ object Main extends App {
             .compile[AppTask, AppTask, ExitCode]
             .drain
         }
-      } yield server).provideSomeLayer[ZEnv](ConfigPrd.live ++ userPersistence ++ loggingLayer)
+      } yield server).provideSomeLayer[ZEnv](ConfigPrd.live ++ userPersistence ++ echoLayer ++ loggingLayer)
 
     program.foldM(
       err => putStrLn(s"Execution failed with: $err") *> IO.succeed(1),

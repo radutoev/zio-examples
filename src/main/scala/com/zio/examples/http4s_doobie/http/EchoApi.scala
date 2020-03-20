@@ -1,17 +1,16 @@
 package com.zio.examples.http4s_doobie.http
 
-import com.zio.examples.http4s_doobie.echo.Echo
+import com.zio.examples.http4s_doobie.echo._
 import io.circe.{Decoder, Encoder}
 import org.http4s.{EntityDecoder, EntityEncoder, HttpRoutes}
 import org.http4s.dsl.Http4sDsl
 import zio._
 import org.http4s.circe._
 import zio.interop.catz._
-import io.circe.generic.auto._
 import zio.logging.Logging
 
 
-final case class EchoApi[R <: Logging](echoService: Echo.Service) {
+final case class EchoApi[R <: Echo with Logging]() {
   type EchoTask[A] = RIO[R, A]
 
   implicit def circeJsonDecoder[A](implicit decoder: Decoder[A]): EntityDecoder[EchoTask, A] = jsonOf[EchoTask, A]
@@ -21,6 +20,6 @@ final case class EchoApi[R <: Logging](echoService: Echo.Service) {
   import dsl._
 
   def route: HttpRoutes[EchoTask] = HttpRoutes.of[EchoTask] {
-    case GET  -> Root / message => echoService.echo(message).flatMap(echo => Ok(echo))
+    case GET  -> Root / message => echo(message).flatMap(echoed => Ok(echoed))
   }
 }
