@@ -18,8 +18,9 @@ import RoutesImplicits._
 
 final case class EchoApi[R <: Echo with Logging]()  {
   //TODO How do we take input custom types (maybe refined)
-  val getEchoEndpoint: Endpoint[String, ApiError, Message, Nothing] = endpoint
+  val getEchoEndpoint: Endpoint[(String, String), ApiError, Message, Nothing] = endpoint
       .get
+      .in(header[String]("X-Userinfo"))
       .in("echo" / path[String]("message"))
       .errorOut(jsonBody[ApiError])
       .out(jsonBody[Message])
@@ -32,9 +33,11 @@ final case class EchoApi[R <: Echo with Logging]()  {
 
   val routes: URIO[Echo with Logging, HttpRoutes[Task]] =
     for {
-      echoRoutes      <- getEchoEndpoint.toZioRoutesR(echo)
+      echoRoutes      <- getEchoEndpoint.toZioRoutesR(echoMessage => echo(echoMessage._1))
       dummyEchoRoutes <- getEchoDummyEndpoint.toZioRoutesR(_ => echo("test"))
   } yield Router("/" -> (echoRoutes <+> dummyEchoRoutes))
 
   val tapirDescription = List(getEchoEndpoint, getEchoDummyEndpoint)
 }
+
+final case class EchoMessage(userInfo: String, message: String)

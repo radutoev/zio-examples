@@ -24,11 +24,11 @@ import zio.logging.slf4j._
  * 1. Tapir + Swagger
  *       a) better docs
  *       b) status code handling.
- * 2. S3
- * 3. User info in layer?
+ * 2. User info in layer?
+ * 3. S3
  * 4. DynamoDB integration
- * 4. SQS integration
- * 5. Unit Tests / Integration Tests.
+ * 5. SQS integration
+ * 6. Unit Tests / Integration Tests.
  */
 object Main extends App {
 
