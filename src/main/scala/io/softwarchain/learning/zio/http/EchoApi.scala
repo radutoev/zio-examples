@@ -1,7 +1,10 @@
 package io.softwarchain.learning.zio.http
 
 import zio._
+import cats.implicits._
+import org.http4s.implicits._
 import zio.interop.catz._
+import zio.interop.catz.implicits._
 import org.http4s.HttpRoutes
 import org.http4s.server.Router
 import sttp.tapir._
@@ -21,7 +24,17 @@ final case class EchoApi[R <: Echo with Logging]()  {
       .errorOut(jsonBody[ApiError])
       .out(jsonBody[Message])
 
-  def routes: URIO[Echo with Logging, HttpRoutes[Task]] = for {
-    echoRoutes <- getEchoEndpoint.toZioRoutesR(echo)
-  } yield Router("/" -> echoRoutes)
+  val getEchoDummyEndpoint: Endpoint[Unit, ApiError, Message, Nothing] = endpoint
+    .get
+    .in("echo" / "dummy")
+    .errorOut(jsonBody[ApiError])
+    .out(jsonBody[Message])
+
+  val routes: URIO[Echo with Logging, HttpRoutes[Task]] =
+    for {
+      echoRoutes      <- getEchoEndpoint.toZioRoutesR(echo)
+      dummyEchoRoutes <- getEchoDummyEndpoint.toZioRoutesR(_ => echo("test"))
+  } yield Router("/" -> (echoRoutes <+> dummyEchoRoutes))
+
+  val tapirDescription = List(getEchoEndpoint, getEchoDummyEndpoint)
 }

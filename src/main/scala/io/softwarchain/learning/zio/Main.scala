@@ -3,7 +3,7 @@ package io.softwarchain.learning.zio
 import cats.implicits._
 import io.softwarchain.learning.zio.configuration.ConfigPrd
 import io.softwarchain.learning.zio.echo.{Echo, EchoService}
-import io.softwarchain.learning.zio.http.EchoApi
+import io.softwarchain.learning.zio.http.{DummyApi, EchoApi}
 import io.softwarchain.learning.zio.persistence.UserPersistence
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
@@ -23,9 +23,7 @@ import zio.logging.slf4j._
 /**
  * 1. Tapir + Swagger
  *       a) better docs
- *       b) new endpoint
- *       c) reuse implicit class
- *       d) status code handling.
+ *       b) status code handling.
  * 2. S3
  * 3. User info in layer?
  * 4. DynamoDB integration
@@ -51,9 +49,13 @@ object Main extends App {
 
         echoApi    =  EchoApi()
         echoRoutes <- echoApi.routes
-        yaml       = List(echoApi.getEchoEndpoint).toOpenAPI(Info(title = "ZIO Examples", version = "0.1")).toYaml
 
-        httpApp = (new SwaggerHttp4s(yaml).routes[Task] <+> echoRoutes).orNotFound
+        dummyApi   = DummyApi()
+
+        yaml       = (echoApi.tapirDescription ++ dummyApi.tapirDescription)
+          .toOpenAPI(Info(title = "ZIO Examples", version = "0.1")).toYaml
+
+        httpApp = (echoRoutes <+> dummyApi.routes <+> new SwaggerHttp4s(yaml).routes[Task]).orNotFound
 
         server <- ZIO.runtime[ZEnv].flatMap { implicit rts =>
           BlazeServerBuilder[Task]
