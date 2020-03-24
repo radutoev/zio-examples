@@ -1,16 +1,19 @@
 package io.softwarchain.learning.zio
 
-import zio.{Has, RIO, ZIO}
 import zio.logging.Logging
+import zio.{Has, RIO, ZIO}
 
 package object echo {
   object Echo {
     trait Service {
-      def echo(message: String): ZIO[Logging, Nothing, String]
+      def echo(message: String): ZIO[Logging, Nothing, Message]
     }
   }
 
   type Echo = Has[Echo.Service]
 
-  def echo(message: String): ZIO[Echo with Logging, Nothing, String] = RIO.accessM(_.get.echo(message))
+  def echo(message: String): ZIO[Echo with Logging, Nothing, Message] = RIO.accessM(_.get.echo(message))
+
+  final case class Message(message: String) extends AnyVal
+  final case class ApiError(reason: String) extends AnyVal
 }

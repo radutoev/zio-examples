@@ -20,7 +20,7 @@ object EchoTest extends DefaultRunnableSpec {
       checkM(Gen.anyString) { message =>
         for {
           echoed <- echo(message)
-        } yield assert(echoed)(equalTo(message))
+        } yield assert(echoed)(equalTo(Message(message)))
       }
     }
   ).provideSomeLayer(TestEnvironment.live ++ echoLayer ++ loggingLayer)

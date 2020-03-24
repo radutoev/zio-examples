@@ -14,7 +14,8 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(h2),
     libraryDependencies ++= http4s,
     libraryDependencies ++= tapir,  //not used in the project yet
-    libraryDependencies ++= Seq(pureConfig)
+    libraryDependencies ++= Seq(pureConfig),
+    libraryDependencies ++= Seq(slf4j)
   )
 
 

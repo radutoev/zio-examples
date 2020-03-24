@@ -45,6 +45,7 @@ object Dependencies {
 
   val h2 = "com.h2database" % "h2" % H2Version
 
+  val slf4j = "org.slf4j" % "slf4j-log4j12" % "1.7.26"
 
   // Circe
 //  "io.circe" %% "circe-generic" % CirceVersion,

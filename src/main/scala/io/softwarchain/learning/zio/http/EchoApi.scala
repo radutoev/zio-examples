@@ -1,25 +1,40 @@
 package io.softwarchain.learning.zio.http
 
-import io.circe.{Decoder, Encoder}
-import io.softwarchain.learning.zio.echo._
-import org.http4s.{EntityDecoder, EntityEncoder, HttpRoutes}
-import org.http4s.dsl.Http4sDsl
 import zio._
-import org.http4s.circe._
 import zio.interop.catz._
+import org.http4s.HttpRoutes
+import org.http4s._
+import org.http4s.server.Router
+import sttp.tapir._
+import sttp.tapir.server.http4s._
+import sttp.tapir.json.circe._
+import io.circe.generic.auto._
+import io.softwarchain.learning.zio.echo.{ApiError, Echo, Message}
+import io.softwarchain.learning.zio.echo._
 import zio.logging.Logging
 
 
-final case class EchoApi[R <: Echo with Logging]() {
-  type EchoTask[A] = RIO[R, A]
+final case class EchoApi[R <: Echo with Logging]()  {
+  implicit class ZioEndpoint[I, E, O](e: Endpoint[I, E, O, EntityBody[Task]]) {
+    def toZioRoutes(logic: I => IO[E, O])(implicit serverOptions: Http4sServerOptions[Task]): HttpRoutes[Task] = {
+      import sttp.tapir.server.http4s._
+      e.toRoutes(i => logic(i).either)
+    }
 
-  implicit def circeJsonDecoder[A](implicit decoder: Decoder[A]): EntityDecoder[EchoTask, A] = jsonOf[EchoTask, A]
-  implicit def circeJsonEncoder[A](implicit decoder: Encoder[A]): EntityEncoder[EchoTask, A] = jsonEncoderOf[EchoTask, A]
-
-  val dsl: Http4sDsl[EchoTask] = Http4sDsl[EchoTask]
-  import dsl._
-
-  def route: HttpRoutes[EchoTask] = HttpRoutes.of[EchoTask] {
-    case GET  -> Root / message => echo(message).flatMap(echoed => Ok(echoed))
+    def toZioRoutesR[ZR](logic: I => ZIO[ZR, E, O])(implicit serverOptions: Http4sServerOptions[Task]): URIO[ZR, HttpRoutes[Task]] = {
+      import sttp.tapir.server.http4s._
+      URIO.access[ZR](env => e.toRoutes(i => logic(i).provide(env).either))
+    }
   }
+
+  //TODO How do we take input custom types (maybe refined)
+  val getEchoEndpoint: Endpoint[String, ApiError, Message, Nothing] = endpoint
+      .get
+      .in("echo" / path[String]("message"))
+      .errorOut(jsonBody[ApiError])
+      .out(jsonBody[Message])
+
+  def routes: URIO[Echo with Logging, HttpRoutes[Task]] = for {
+    echoRoutes <- getEchoEndpoint.toZioRoutesR(echo)
+  } yield Router("/" -> echoRoutes)
 }
