@@ -22,6 +22,10 @@ import zio.logging.slf4j._
 
 /**
  * 1. Tapir + Swagger
+ *       a) better docs
+ *       b) new endpoint
+ *       c) reuse implicit class
+ *       d) status code handling.
  * 2. S3
  * 3. User info in layer?
  * 4. DynamoDB integration
