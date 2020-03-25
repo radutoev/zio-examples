@@ -10,6 +10,9 @@ object Dependencies {
   val PureConfigVersion = "0.12.3"
   val DoobieVersion = "0.8.8"
   val H2Version = "1.4.199"
+  val RefinedVersion = "0.9.13"
+  val NewTypesVersion = "0.4.3"
+  val CirceRefinedVersion = "0.13.0"
 
   lazy val zio = Seq(
     "dev.zio" %% "zio" % ZioVersion,
@@ -26,6 +29,11 @@ object Dependencies {
     "org.http4s" %% "http4s-circe" % Http4sVersion,
     "org.http4s" %% "http4s-dsl" % Http4sVersion)
 
+  lazy val circeModules = Seq(
+    "io.circe" %% "circe-refined" % CirceRefinedVersion,
+    "io.circe" %% "circe-generic-extras" % CirceRefinedVersion
+  )
+
   lazy val tapir = Seq("com.softwaremill.sttp.tapir" %% "tapir-core" % TapirVersion,
     "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % TapirVersion,
     "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-http4s" % TapirVersion,
@@ -34,6 +42,11 @@ object Dependencies {
     "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" % TapirVersion)
 
   lazy val pureConfig = "com.github.pureconfig" %% "pureconfig" % PureConfigVersion
+
+  lazy val typeHelpers = Seq(
+    "eu.timepit" %% "refined" % RefinedVersion,
+    "io.estatico" %% "newtype" % NewTypesVersion
+  )
 
   /**
    * @deprecated
@@ -46,8 +59,4 @@ object Dependencies {
   val h2 = "com.h2database" % "h2" % H2Version
 
   val slf4j = "org.slf4j" % "slf4j-log4j12" % "1.7.26"
-
-  // Circe
-//  "io.circe" %% "circe-generic" % CirceVersion,
-//  "io.circe" %% "circe-generic-extras" % CirceVersion,
 }

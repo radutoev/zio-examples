@@ -7,6 +7,9 @@ ThisBuild / organization := "io.softwarechain.learning"
 lazy val root = (project in file("."))
   .settings(
     name := "zio-examples",
+    scalacOptions := Seq(
+        "-Ymacro-annotations"
+    ),
     libraryDependencies ++= zio,
     libraryDependencies ++= Seq(zioCats),
     libraryDependencies ++= zioLogging,
@@ -14,7 +17,9 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(h2),
     libraryDependencies ++= http4s,
     libraryDependencies ++= tapir,  //not used in the project yet
+    libraryDependencies ++= circeModules,
     libraryDependencies ++= Seq(pureConfig),
+    libraryDependencies ++= typeHelpers,
     libraryDependencies ++= Seq(slf4j)
   )
 

@@ -1,4 +1,4 @@
-package io.softwarchain.learning.zio.http
+package io.softwarchain.learning.zio.echo
 
 import zio._
 import cats.implicits._
@@ -14,16 +14,16 @@ import io.softwarchain.learning.zio.echo.{ApiError, Echo, Message}
 import io.softwarchain.learning.zio.echo._
 import zio.logging.Logging
 
-import RoutesImplicits._
+import io.softwarchain.learning.zio.http.RoutesImplicits._
 
 final case class EchoApi[R <: Echo with Logging]()  {
   //TODO How do we take input custom types (maybe refined)
   val getEchoEndpoint: Endpoint[(String, String), ApiError, Message, Nothing] = endpoint
-      .get
-      .in(header[String]("X-Userinfo"))
-      .in("echo" / path[String]("message"))
-      .errorOut(jsonBody[ApiError])
-      .out(jsonBody[Message])
+    .get
+    .in(header[String]("X-Userinfo"))
+    .in("echo" / path[String]("message"))
+    .errorOut(jsonBody[ApiError])
+    .out(jsonBody[Message])
 
   val getEchoDummyEndpoint: Endpoint[Unit, ApiError, Message, Nothing] = endpoint
     .get
@@ -35,9 +35,12 @@ final case class EchoApi[R <: Echo with Logging]()  {
     for {
       echoRoutes      <- getEchoEndpoint.toZioRoutesR(echoMessage => echo(echoMessage._1))
       dummyEchoRoutes <- getEchoDummyEndpoint.toZioRoutesR(_ => echo("test"))
-  } yield Router("/" -> (echoRoutes <+> dummyEchoRoutes))
+    } yield Router("/" -> (echoRoutes <+> dummyEchoRoutes))
 
   val tapirDescription = List(getEchoEndpoint, getEchoDummyEndpoint)
 }
 
-final case class EchoMessage(userInfo: String, message: String)
+object EchoApi {
+  final case class EchoMessage(userInfo: String, message: String)
+}
+

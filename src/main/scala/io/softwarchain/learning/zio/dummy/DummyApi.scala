@@ -1,15 +1,17 @@
-package io.softwarchain.learning.zio.http
+package io.softwarchain.learning.zio.dummy
 
+import zio._
 import cats.implicits._
 import org.http4s.implicits._
+import zio.interop.catz._
+import zio.interop.catz.implicits._
 import org.http4s.HttpRoutes
 import org.http4s.server.Router
 import sttp.tapir._
-import zio._
-import zio.interop.catz._
-import zio.interop.catz.implicits._
+import sttp.tapir.json.circe._
+import io.circe.generic.auto._
 
-import RoutesImplicits._
+import io.softwarchain.learning.zio.http.RoutesImplicits._
 
 final case class DummyApi()  {
   val getDummyEndpoint: Endpoint[Unit, String, String, Nothing] = endpoint

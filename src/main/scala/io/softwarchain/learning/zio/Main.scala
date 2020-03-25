@@ -2,9 +2,8 @@ package io.softwarchain.learning.zio
 
 import cats.implicits._
 import io.softwarchain.learning.zio.configuration.ConfigPrd
-import io.softwarchain.learning.zio.echo.{Echo, EchoService}
-import io.softwarchain.learning.zio.http.{DummyApi, EchoApi}
-import io.softwarchain.learning.zio.persistence.UserPersistence
+import io.softwarchain.learning.zio.dummy.DummyApi
+import io.softwarchain.learning.zio.echo.{Echo, EchoApi, EchoService}
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
 import sttp.tapir.docs.openapi._
@@ -34,7 +33,6 @@ object Main extends App {
 
   type AppEnvironment = Clock with Blocking
     with Logging
-    with UserPersistence
     with Echo
 
   type AppTask[A] = RIO[AppEnvironment, A]
