@@ -1,5 +1,7 @@
 package io.softwarchain.learning.zio
 
+import java.util.concurrent.TimeUnit
+
 import cats.implicits._
 import io.softwarchain.learning.zio.aws.{Storage, StorageApi, StorageService}
 import io.softwarchain.learning.zio.configuration.{ApiProd, S3Prod}
@@ -20,6 +22,8 @@ import zio.interop.catz._
 import zio.interop.catz.implicits._
 import zio.logging.Logging
 import zio.logging.slf4j._
+
+import scala.concurrent.duration._
 
 /**
  * 1. Tapir + Swagger
@@ -71,6 +75,9 @@ object Main extends App {
           BlazeServerBuilder[Task]
             .bindHttp(api.port, api.endpoint)
             .withHttpApp(httpApp)
+//            .withResponseHeaderTimeout(FiniteDuration.apply(30, TimeUnit.SECONDS))
+            .withResponseHeaderTimeout(Duration.Inf)
+            .withIdleTimeout(FiniteDuration.apply(30, TimeUnit.SECONDS))
             .serve
             .compile
             .drain

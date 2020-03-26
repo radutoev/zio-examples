@@ -1,5 +1,8 @@
 package io.softwarchain.learning.zio.aws
 
+import cats.implicits._
+import zio.interop.catz._
+import zio.interop.catz.implicits._
 import io.circe.generic.auto._
 import io.softwarchain.learning.zio.http.ApiError
 import zio.interop.catz._
@@ -20,17 +23,17 @@ final case class StorageApi[R <: Storage with Logging]() {
     .errorOut(jsonBody[ApiError])
     .out(jsonBody[List[String]])
 
-  implicit class ZioEndpointModified[I, E, O](e: Endpoint[I, E, O, EntityBody[Task]]) {
-    def toZioRoutesRModified[ZR](logic: I => ZIO[ZR, E, O])(implicit serverOptions: Http4sServerOptions[Task]): URIO[ZR, HttpRoutes[Task]] = {
-      import sttp.tapir.server.http4s._
-      URIO.access[ZR](env => e.toRoutes(i => logic(i).provide(env).either))
-    }
-  }
+  val listObjectsEndpoint: Endpoint[String, ApiError, List[String], Nothing] = endpoint
+    .get
+    .in("buckets" / path[String]("bucket") / "objects")
+    .errorOut(jsonBody[ApiError])
+    .out(jsonBody[List[String]])
 
   val routes: URIO[Storage with Logging, HttpRoutes[Task]] =
     for {
-      storageRoutes <- listBucketsEndpoint.toZioRoutesR(_ => buckets().mapError(t => ApiError(t.getMessage)))
-    } yield Router("/" -> (storageRoutes))
+      bucketsEndpoint <- listBucketsEndpoint.toZioRoutesR(_ => buckets().mapError(t => ApiError(t.getMessage)))
+      objectsEndpoint <- listObjectsEndpoint.toZioRoutesR(bucketName => objects(bucketName).mapError(t => ApiError(t.getMessage)))
+    } yield Router("/" -> (bucketsEndpoint <+> objectsEndpoint))
 
-  val tapirDescription = List(listBucketsEndpoint)
+  val tapirDescription = List(listBucketsEndpoint, listObjectsEndpoint)
 }
