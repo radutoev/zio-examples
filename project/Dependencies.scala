@@ -45,6 +45,7 @@ object Dependencies {
 
   lazy val typeHelpers = Seq(
     "eu.timepit" %% "refined" % RefinedVersion,
+    "eu.timepit" %% "refined-pureconfig" % RefinedVersion,
     "io.estatico" %% "newtype" % NewTypesVersion
   )
 
