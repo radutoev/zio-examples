@@ -10,10 +10,10 @@ import org.http4s.server.Router
 import sttp.tapir._
 import sttp.tapir.json.circe._
 import io.circe.generic.auto._
-import io.softwarchain.learning.zio.echo.{ApiError, Echo, Message}
+import io.softwarchain.learning.zio.echo.{Echo, Message}
 import io.softwarchain.learning.zio.echo._
+import io.softwarchain.learning.zio.http.ApiError
 import zio.logging.Logging
-
 import io.softwarchain.learning.zio.http.RoutesImplicits._
 
 final case class EchoApi[R <: Echo with Logging]()  {

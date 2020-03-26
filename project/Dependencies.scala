@@ -13,6 +13,7 @@ object Dependencies {
   val RefinedVersion = "0.9.13"
   val NewTypesVersion = "0.4.3"
   val CirceRefinedVersion = "0.13.0"
+  val AwsVersion = "2.11.2"
 
   lazy val zio = Seq(
     "dev.zio" %% "zio" % ZioVersion,
@@ -47,6 +48,10 @@ object Dependencies {
     "eu.timepit" %% "refined" % RefinedVersion,
     "eu.timepit" %% "refined-pureconfig" % RefinedVersion,
     "io.estatico" %% "newtype" % NewTypesVersion
+  )
+
+  lazy val aws = Seq(
+    "software.amazon.awssdk" % "s3" % AwsVersion
   )
 
   /**

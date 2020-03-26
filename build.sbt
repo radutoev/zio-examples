@@ -18,6 +18,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= http4s,
     libraryDependencies ++= tapir,  //not used in the project yet
     libraryDependencies ++= circeModules,
+    libraryDependencies ++= aws,
     libraryDependencies ++= Seq(pureConfig),
     libraryDependencies ++= typeHelpers,
     libraryDependencies ++= Seq(slf4j)

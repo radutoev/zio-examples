@@ -15,5 +15,4 @@ package object echo {
   def echo(message: String): ZIO[Echo with Logging, Nothing, Message] = RIO.accessM(_.get.echo(message))
 
   final case class Message(message: String) extends AnyVal
-  final case class ApiError(reason: String) extends AnyVal
 }

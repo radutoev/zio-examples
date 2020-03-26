@@ -1,7 +1,9 @@
 package io.softwarchain.learning.zio
 
 import cats.implicits._
-import io.softwarchain.learning.zio.configuration.ConfigPrd
+import io.softwarchain.learning.zio.aws.{Storage, StorageApi, StorageService}
+import io.softwarchain.learning.zio.configuration.{ApiProd, S3Prod}
+import io.softwarchain.learning.zio.configuration._
 import io.softwarchain.learning.zio.dummy.DummyApi
 import io.softwarchain.learning.zio.echo.{Echo, EchoApi, EchoService}
 import org.http4s.implicits._
@@ -32,6 +34,8 @@ import zio.logging.slf4j._
 object Main extends App {
 
   type AppEnvironment = Clock with Blocking
+    with S3Configuration
+    with Storage
     with Logging
     with Echo
 
@@ -39,21 +43,29 @@ object Main extends App {
 
   val loggingLayer: ZLayer[Any, Nothing, Logging] = Slf4jLogger.make((_, message) => message)
   val echoLayer: ZLayer[Any, Nothing, Echo] = EchoService.live()
+  val storageLayer: ZLayer[Any, Throwable, Storage] = (S3Prod.live) >>> StorageService.live()
 
   override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] = {
     val program: ZIO[ZEnv, Throwable, Unit] =
       (for {
-        api <- configuration.apiConfig
+        api        <- configuration.apiConfig
 
-        echoApi    =  EchoApi()
-        echoRoutes <- echoApi.routes
+        echoApi       =  EchoApi()
+        echoRoutes    <- echoApi.routes
+        dummyApi      = DummyApi()
+        storageApi    = StorageApi()
+        storageRoutes <- storageApi.routes
 
-        dummyApi   = DummyApi()
+        yaml       = (echoApi.tapirDescription ++ dummyApi.tapirDescription ++ storageApi.tapirDescription)
+                      .toOpenAPI(Info(title = "ZIO Examples", version = "0.1"))
+                      .toYaml
 
-        yaml       = (echoApi.tapirDescription ++ dummyApi.tapirDescription)
-          .toOpenAPI(Info(title = "ZIO Examples", version = "0.1")).toYaml
-
-        httpApp = (echoRoutes <+> dummyApi.routes <+> new SwaggerHttp4s(yaml).routes[Task]).orNotFound
+        httpApp = (
+          echoRoutes <+>
+          dummyApi.routes <+>
+          storageRoutes <+>
+          new SwaggerHttp4s(yaml).routes[Task]
+        ).orNotFound
 
         server <- ZIO.runtime[ZEnv].flatMap { implicit rts =>
           BlazeServerBuilder[Task]
@@ -63,7 +75,7 @@ object Main extends App {
             .compile
             .drain
         }
-      } yield server).provideSomeLayer[ZEnv](ConfigPrd.live ++ echoLayer ++ loggingLayer)
+      } yield server).provideSomeLayer[ZEnv](ApiProd.live ++ echoLayer ++ loggingLayer ++ storageLayer)
 
     program.foldM(
       err => putStrLn(s"Execution failed with: $err") *> IO.succeed(1),

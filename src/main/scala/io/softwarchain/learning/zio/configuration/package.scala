@@ -5,7 +5,8 @@ import zio.{Has, ZIO}
 
 package object configuration {
 
-  type Configuration = Has[ApiConfig]
+  type ApiConfiguration = Has[ApiConfig]
+  type S3Configuration = Has[S3Config]
 
   final case class AppConfig(api: ApiConfig, aws: AwsConfig)
   final case class ApiConfig(endpoint: String, port: Int)
@@ -13,4 +14,5 @@ package object configuration {
   final case class S3Config(accessKey: NonEmptyString, secretAccessKey: NonEmptyString)
 
   val apiConfig: ZIO[Has[ApiConfig], Throwable, ApiConfig] = ZIO.access(_.get)
+  val s3Config: ZIO[Has[S3Config], Throwable, S3Config] = ZIO.access(_.get)
 }
