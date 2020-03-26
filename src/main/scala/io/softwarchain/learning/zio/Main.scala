@@ -30,10 +30,8 @@ import scala.concurrent.duration._
  *       a) better docs
  *       b) status code handling.
  * 2. User info in layer?
- * 3. S3
- * 4. DynamoDB integration
- * 5. SQS integration
- * 6. Unit Tests / Integration Tests.
+ * 3. DynamoDB integration
+ * 4. SQS integration
  */
 object Main extends App {
 

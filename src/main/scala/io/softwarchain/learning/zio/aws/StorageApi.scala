@@ -10,11 +10,10 @@ import sttp.tapir.{endpoint, jsonBody}
 import sttp.tapir._
 import sttp.tapir.json.circe._
 import zio.logging.Logging
-import org.http4s.{EntityBody, HttpRoutes}
+import org.http4s.HttpRoutes
 import zio.{Task, URIO, ZIO}
 import io.softwarchain.learning.zio.http.RoutesImplicits._
 import org.http4s.server.Router
-import sttp.tapir.server.http4s.Http4sServerOptions
 
 final case class StorageApi[R <: Storage with Logging]() {
   val listBucketsEndpoint: Endpoint[Unit, ApiError, List[String], Nothing] = endpoint

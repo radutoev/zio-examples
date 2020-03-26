@@ -1,7 +1,6 @@
 package io.softwarchain.learning.zio.aws
 
 import java.net.URI
-import java.util.concurrent.CompletableFuture
 
 import io.softwarchain.learning.zio.configuration
 import io.softwarchain.learning.zio.configuration.S3Config
@@ -10,7 +9,7 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.model.{Bucket, ListBucketsResponse, ListObjectsV2Request}
 import zio.logging._
-import zio.{Has, IO, ZIO, ZLayer}
+import zio.{Has, ZIO, ZLayer}
 
 import scala.jdk.CollectionConverters._
 
@@ -20,7 +19,7 @@ final class StorageService(s3AsyncClient: S3AsyncClient) extends Storage.Service
       _               <- logLocally(LogAnnotation.Name("StorageService" :: Nil)) {
                             logInfo("Fetching existent buckets")
                           }
-      buckets           <- handleS3EffectAsync(_.listBuckets()).map(responseToBuckets(_).map(bucketName))
+      buckets           <- ZIO.fromCompletionStage(s3AsyncClient.listBuckets()).map(responseToBuckets(_).map(bucketName))
       _                 <- logLocally(LogAnnotation.Name("StorageService" :: Nil)) {
                             logInfo(s"Found ${buckets.size}")
                          }
@@ -30,16 +29,6 @@ final class StorageService(s3AsyncClient: S3AsyncClient) extends Storage.Service
   def objects(bucketName: String): ZIO[Logging, Throwable, List[String]] = for {
     listResponse <- ZIO.fromCompletionStage(s3AsyncClient.listObjectsV2(ListObjectsV2Request.builder().bucket(bucketName).build()))
   } yield listResponse.contents().asScala.toList.map(_.key())
-
-  private def handleS3EffectAsync[T](toS3Response: S3AsyncClient => CompletableFuture[T]): ZIO[Any, Throwable, T] =
-      IO.effectAsync[Throwable, T] { callback =>
-        toS3Response(s3AsyncClient).handle[Unit]((response, err) => {
-          err match {
-            case null => callback(IO.succeed(response))
-            case ex   => callback(IO.fail(ex))
-          }
-        })
-    }
 
   private val responseToBuckets: ListBucketsResponse => List[Bucket] = response => response.buckets().asScala.toList
 
