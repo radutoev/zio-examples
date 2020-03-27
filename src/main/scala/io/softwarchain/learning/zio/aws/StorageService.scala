@@ -1,9 +1,9 @@
 package io.softwarchain.learning.zio.aws
 
 import java.net.URI
-import java.util.concurrent.CompletableFuture
 
-import io.softwarchain.learning.zio.configuration
+import io.softwarchain.learning.zio.auth.Auth
+import io.softwarchain.learning.zio.{auth, configuration}
 import io.softwarchain.learning.zio.configuration.S3Config
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.regions.Region
@@ -17,9 +17,10 @@ import scala.jdk.CollectionConverters._
 final class StorageService(s3AsyncClient: S3AsyncClient) extends Storage.Service {
   private val logger = logLocally(LogAnnotation.Name("StorageService" :: Nil))(ZIO.unit)
 
-  override def buckets(): ZIO[Logging, Throwable, List[String]] = {
+  override def buckets(): ZIO[Logging with Auth, Throwable, List[String]] = {
     for {
-      _                 <- logger *> logInfo("Fetching buckets")
+      user              <- auth.userInfo()
+      _                 <- logger *> logInfo(s"User ${user.email} is fetching buckets")
       buckets           <- ZIO.fromCompletionStage(s3AsyncClient.listBuckets()).map(responseToBuckets(_).map(bucketName))
       _                 <- logger *> logInfo(s"Found ${buckets.size}")
     } yield buckets

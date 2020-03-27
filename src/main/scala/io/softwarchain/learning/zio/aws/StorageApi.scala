@@ -4,6 +4,8 @@ import cats.implicits._
 import zio.interop.catz._
 import zio.interop.catz.implicits._
 import io.circe.generic.auto._
+import io.softwarchain.learning.zio.Layers
+import io.softwarchain.learning.zio.auth.{Auth, AuthService}
 import io.softwarchain.learning.zio.http.ApiError
 import zio.interop.catz._
 import sttp.tapir.{endpoint, jsonBody}
@@ -16,8 +18,9 @@ import io.softwarchain.learning.zio.http.RoutesImplicits._
 import org.http4s.server.Router
 
 final case class StorageApi[R <: Storage with Logging]() {
-  val listBucketsEndpoint: Endpoint[Unit, ApiError, List[String], Nothing] = endpoint
+  val listBucketsEndpoint: Endpoint[String, ApiError, List[String], Nothing] = endpoint
     .get
+    .in(header[String]("X-Userinfo"))
     .in("buckets")
     .errorOut(jsonBody[ApiError])
     .out(jsonBody[List[String]])
@@ -28,11 +31,14 @@ final case class StorageApi[R <: Storage with Logging]() {
     .errorOut(jsonBody[ApiError])
     .out(jsonBody[List[String]])
 
-  val routes: URIO[Storage with Logging, HttpRoutes[Task]] =
+  val routes: ZIO[zio.ZEnv, Nothing, HttpRoutes[Task]] =
     for {
-      bucketsEndpoint <- listBucketsEndpoint.toZioRoutesR(_ => buckets().mapError(t => ApiError(t.getMessage)))
-      objectsEndpoint <- listObjectsEndpoint.toZioRoutesR(bucketName => objects(bucketName).mapError(t => ApiError(t.getMessage)))
-    } yield Router("/" -> (bucketsEndpoint <+> objectsEndpoint))
+      bucketsEndpoint <- listBucketsEndpoint.toZioRoutesR(userData => buckets()
+        .provideCustomLayer(Layers.storageLayer ++ Layers.loggingLayer ++ AuthService.live(userData).fresh) //Radu: Do I actually need .fresh here?
+        .mapError(t => ApiError(t.getMessage))
+      )
+//      objectsEndpoint <- listObjectsEndpoint.toZioRoutesR(bucketName => objects(bucketName).mapError(t => ApiError(t.getMessage)))
+    } yield Router("/" -> (bucketsEndpoint))// <+> objectsEndpoint))
 
   val tapirDescription = List(listBucketsEndpoint, listObjectsEndpoint)
 }

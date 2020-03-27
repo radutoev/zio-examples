@@ -1,5 +1,6 @@
 package io.softwarchain.learning.zio
 
+import io.softwarchain.learning.zio.user.User
 import zio.logging.Logging
 import zio.{Has, RIO, ZIO}
 
