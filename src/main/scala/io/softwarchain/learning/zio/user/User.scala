@@ -7,14 +7,10 @@ import io.circe.Decoder
 import io.circe.refined._
 import io.circe.generic.extras.ConfiguredJsonCodec
 import io.circe.generic.semiauto.deriveDecoder
-import io.circe.parser.parse
 import io.estatico.newtype.Coercible
 import io.estatico.newtype.macros.newtype
 import io.softwarchain.learning.zio.user.User.UserId
 import io.softwarchain.learning.zio.user.refinements.{Email, EmailPredicate}
-import zio.{Task, ZIO}
-
-import scala.util.Try
 
 final case class User(id: UserId, email: Email)
 
