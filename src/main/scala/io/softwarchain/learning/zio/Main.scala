@@ -3,12 +3,11 @@ package io.softwarchain.learning.zio
 import java.util.concurrent.TimeUnit
 
 import cats.implicits._
-import io.softwarchain.learning.zio.aws.{Storage, StorageApi}
+import io.softwarchain.learning.zio.aws.StorageApi
 import io.softwarchain.learning.zio.configuration.{ApiProd, _}
 import io.softwarchain.learning.zio.dummy.DummyApi
 import io.softwarchain.learning.zio.echo.{Echo, EchoApi}
 import io.softwarchain.learning.zio.Layers._
-import io.softwarchain.learning.zio.auth.Auth
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
 import sttp.tapir.docs.openapi._
@@ -36,9 +35,6 @@ import scala.concurrent.duration._
 object Main extends App {
 
   type AppEnvironment = Clock with Blocking
-//    with Auth
-    with S3Configuration
-    with Storage
     with Logging
     with Echo
 
