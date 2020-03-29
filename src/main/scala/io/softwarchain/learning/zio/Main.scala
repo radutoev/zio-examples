@@ -3,17 +3,16 @@ package io.softwarchain.learning.zio
 import java.util.concurrent.TimeUnit
 
 import cats.implicits._
+import io.circe.{Decoder, Encoder}
 import io.softwarchain.learning.zio.aws.StorageApi
 import io.softwarchain.learning.zio.configuration.{ApiProd, _}
-import io.softwarchain.learning.zio.dummy.DummyApi
 import io.softwarchain.learning.zio.echo.{Echo, EchoApi}
 import io.softwarchain.learning.zio.Layers._
+import org.http4s.{EntityDecoder, EntityEncoder}
+import org.http4s.circe.{jsonEncoderOf, jsonOf}
 import org.http4s.implicits._
+import org.http4s.server.Router
 import org.http4s.server.blaze.BlazeServerBuilder
-import sttp.tapir.docs.openapi._
-import sttp.tapir.openapi.Info
-import sttp.tapir.openapi.circe.yaml._
-import sttp.tapir.swagger.http4s.SwaggerHttp4s
 import zio._
 import zio.blocking.Blocking
 import zio.clock.Clock
@@ -33,11 +32,14 @@ import scala.concurrent.duration._
  */
 object Main extends App {
 
-  type AppEnvironment = Clock with Blocking
-    with Logging
-    with Echo
+//  type AppEnvironment = Clock with Blocking
+//    with Logging
+//    with Echo
+//
+//  type AppTask[A] = RIO[AppEnvironment, A]
 
-  type AppTask[A] = RIO[AppEnvironment, A]
+  implicit def circeJsonDecoder[A](implicit decoder: Decoder[A]): EntityDecoder[Task, A] = jsonOf[Task, A]
+  implicit def circeJsonEncoder[A](implicit decoder: Encoder[A]): EntityEncoder[Task, A] = jsonEncoderOf[Task, A]
 
   override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] = {
     val program: ZIO[ZEnv, Throwable, Unit] =
@@ -45,20 +47,12 @@ object Main extends App {
         api        <- configuration.apiConfig
 
         echoApi       =  EchoApi()
-        echoRoutes    <- echoApi.routes
-        dummyApi      = DummyApi()
+//        dummyApi      = DummyApi()
         storageApi    = StorageApi()
-        storageRoutes <- storageApi.routes
 
-        yaml       = (echoApi.tapirDescription ++ dummyApi.tapirDescription ++ storageApi.tapirDescription)
-                      .toOpenAPI(Info(title = "ZIO Examples", version = "0.1"))
-                      .toYaml
-
-        httpApp = (
-          echoRoutes <+>
-          dummyApi.routes <+>
-          storageRoutes <+>
-          new SwaggerHttp4s(yaml).routes[Task]
+        httpApp = Router[Task](
+          "/echo" -> echoApi.routes,
+          "/storage" -> storageApi.routes
         ).orNotFound
 
         server <- ZIO.runtime[ZEnv].flatMap { implicit rts =>

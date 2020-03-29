@@ -1,5 +1,6 @@
 package io.softwarchain.learning.zio.echo
 
+import io.softwarchain.learning.zio.EchoError
 import io.softwarchain.learning.zio.echo._
 import zio.ZLayer
 import zio.clock.Clock
@@ -15,7 +16,7 @@ object EchoTest extends DefaultRunnableSpec {
 
   type EchoTestEnvironment = TestEnvironment with Echo with Logging
 
-  override def spec: Spec[TestEnvironment, TestFailure[Nothing], TestSuccess] = suite("Echo Spec")(
+  override def spec: Spec[TestEnvironment, TestFailure[EchoError], TestSuccess] = suite("Echo Spec")(
     testM("Received message is returned") {
       checkM(Gen.anyString) { message =>
         for {
