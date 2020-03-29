@@ -28,9 +28,8 @@ import scala.concurrent.duration._
  * 1. Tapir + Swagger
  *       a) better docs
  *       b) status code handling.
- * 2. User info in layer?
- * 3. DynamoDB integration
- * 4. SQS integration
+ * 2. DynamoDB integration
+ * 3. SQS integration
  */
 object Main extends App {
 

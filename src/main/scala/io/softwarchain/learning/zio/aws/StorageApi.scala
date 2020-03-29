@@ -31,12 +31,14 @@ final case class StorageApi[R <: Storage with Logging]() {
     .errorOut(jsonBody[ApiError])
     .out(jsonBody[List[String]])
 
-  val routes: ZIO[zio.ZEnv, Nothing, HttpRoutes[Task]] =
+
+  val routes: ZIO[Logging with Storage, Nothing, HttpRoutes[Task]] =
     for {
       bucketsEndpoint <- listBucketsEndpoint.toZioRoutesR(userData => buckets()
         .provideCustomLayer(Layers.storageLayer ++ Layers.loggingLayer ++ AuthService.live(userData).fresh) //Radu: Do I actually need .fresh here?
         .mapError(t => ApiError(t.getMessage))
       )
+      //TODO Type signature does not match.
 //      objectsEndpoint <- listObjectsEndpoint.toZioRoutesR(bucketName => objects(bucketName).mapError(t => ApiError(t.getMessage)))
     } yield Router("/" -> (bucketsEndpoint))// <+> objectsEndpoint))
 
