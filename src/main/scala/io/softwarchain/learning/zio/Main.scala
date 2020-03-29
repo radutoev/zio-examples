@@ -66,7 +66,7 @@ object Main extends App {
             .compile
             .drain
         }
-      } yield server).provideSomeLayer[ZEnv](ApiProd.live ++ echoLayer ++ loggingLayer)
+      } yield server).provideSomeLayer[ZEnv](ApiProd.live)
 
     program.foldM(
       err => putStrLn(s"Execution failed with: $err") *> IO.succeed(1),
