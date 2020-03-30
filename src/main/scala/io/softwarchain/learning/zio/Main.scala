@@ -6,20 +6,16 @@ import cats.implicits._
 import io.circe.{Decoder, Encoder}
 import io.softwarchain.learning.zio.aws.StorageApi
 import io.softwarchain.learning.zio.configuration.{ApiProd, _}
-import io.softwarchain.learning.zio.echo.{Echo, EchoApi}
-import io.softwarchain.learning.zio.Layers._
+import io.softwarchain.learning.zio.echo.EchoApi
 import org.http4s.{EntityDecoder, EntityEncoder}
 import org.http4s.circe.{jsonEncoderOf, jsonOf}
 import org.http4s.implicits._
 import org.http4s.server.Router
 import org.http4s.server.blaze.BlazeServerBuilder
 import zio._
-import zio.blocking.Blocking
-import zio.clock.Clock
 import zio.console.putStrLn
 import zio.interop.catz._
 import zio.interop.catz.implicits._
-import zio.logging.Logging
 
 import scala.concurrent.duration._
 
@@ -31,12 +27,6 @@ import scala.concurrent.duration._
  * 3. SQS integration
  */
 object Main extends App {
-
-//  type AppEnvironment = Clock with Blocking
-//    with Logging
-//    with Echo
-//
-//  type AppTask[A] = RIO[AppEnvironment, A]
 
   implicit def circeJsonDecoder[A](implicit decoder: Decoder[A]): EntityDecoder[Task, A] = jsonOf[Task, A]
   implicit def circeJsonEncoder[A](implicit decoder: Encoder[A]): EntityEncoder[Task, A] = jsonEncoderOf[Task, A]

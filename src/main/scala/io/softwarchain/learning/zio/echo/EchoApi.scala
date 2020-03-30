@@ -1,16 +1,13 @@
 package io.softwarchain.learning.zio.echo
 
-import io.circe.{Decoder, Encoder}
 import io.circe.generic.auto._
 import io.softwarchain.learning.zio.{EchoError, Layers}
 import org.http4s.dsl.Http4sDsl
-import org.http4s.{EntityDecoder, EntityEncoder, HttpRoutes}
-import org.http4s.util.CaseInsensitiveString
+import org.http4s.HttpRoutes
 import zio._
 import zio.interop.catz._
 import zio.logging.Logging
 import io.softwarchain.learning.zio.Main.circeJsonEncoder
-import io.softwarchain.learning.zio.http.ApiError
 
 
 final case class EchoApi[R <: Echo with Logging]() extends Http4sDsl[Task] {
