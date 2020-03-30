@@ -12,6 +12,7 @@ import org.http4s.circe.{jsonEncoderOf, jsonOf}
 import org.http4s.implicits._
 import org.http4s.server.Router
 import org.http4s.server.blaze.BlazeServerBuilder
+import org.http4s.server.middleware.CORS
 import zio._
 import zio.console.putStrLn
 import zio.interop.catz._
@@ -48,7 +49,7 @@ object Main extends App {
         server <- ZIO.runtime[ZEnv].flatMap { implicit rts =>
           BlazeServerBuilder[Task]
             .bindHttp(api.port, api.endpoint)
-            .withHttpApp(httpApp)
+            .withHttpApp(CORS(httpApp))
 //            .withResponseHeaderTimeout(FiniteDuration.apply(30, TimeUnit.SECONDS))
             .withResponseHeaderTimeout(Duration.Inf)
             .withIdleTimeout(FiniteDuration.apply(30, TimeUnit.SECONDS))
