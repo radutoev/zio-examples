@@ -14,7 +14,7 @@ final case class EchoApi[R <: Echo with Logging]() extends Http4sDsl[Task] {
 
   def routes: HttpRoutes[Task] = HttpRoutes.of[Task] {
     case GET -> Root / message =>
-      val value: ZIO[Echo with Logging, EchoError, Message] = echo(message)
+      val value: ZIO[Echo with Logging, EchoError, Message] = echo(Message(message))
       val withLayers: ZIO[Any, EchoError, Message] = value.provideLayer(Layers.echoLayer ++ Layers.loggingLayer)
       withLayers.foldM(_ => InternalServerError(), echoed => Ok(echoed))
   }
