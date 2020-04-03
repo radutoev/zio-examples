@@ -10,6 +10,7 @@ lazy val root = (project in file("."))
     scalacOptions := Seq(
         "-Ymacro-annotations",
         "-language:higherKinds", // Allow higher-kinded types
+        "-language:postfixOps"
     ),
     libraryDependencies ++= zio,
     libraryDependencies ++= Seq(zioCats),

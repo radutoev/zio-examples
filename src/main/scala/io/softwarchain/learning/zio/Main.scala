@@ -2,11 +2,11 @@ package io.softwarchain.learning.zio
 
 import java.util.concurrent.TimeUnit
 
+import caliban.Http4sAdapter
 import cats.implicits._
 import io.circe.{Decoder, Encoder}
-import io.softwarchain.learning.zio.aws.StorageApi
 import io.softwarchain.learning.zio.configuration.{ApiProd, _}
-import io.softwarchain.learning.zio.echo.EchoApi
+import io.softwarchain.learning.zio.gql.StorageGql
 import org.http4s.{EntityDecoder, EntityEncoder}
 import org.http4s.circe.{jsonEncoderOf, jsonOf}
 import org.http4s.implicits._
@@ -21,10 +21,7 @@ import zio.interop.catz.implicits._
 import scala.concurrent.duration._
 
 /**
- * 1. Tapir + Swagger
- *       a) better docs
- *       b) status code handling.
- * 2. DynamoDB integration
+ * . DynamoDB integration
  * 3. SQS integration
  */
 object Main extends App {
@@ -32,24 +29,25 @@ object Main extends App {
   implicit def circeJsonDecoder[A](implicit decoder: Decoder[A]): EntityDecoder[Task, A] = jsonOf[Task, A]
   implicit def circeJsonEncoder[A](implicit decoder: Encoder[A]): EntityEncoder[Task, A] = jsonEncoderOf[Task, A]
 
+  type AppTask[A] = RIO[ZEnv, A]
+
   override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] = {
     val program: ZIO[ZEnv, Throwable, Unit] =
       (for {
         api        <- configuration.apiConfig
 
-        echoApi       =  EchoApi()
-//        dummyApi      = DummyApi()
-        storageApi    = StorageApi()
+        interpreter <- StorageGql.storageApi.interpreter.map(_.provideCustomLayer(
+          Layers.loggingLayer ++ Layers.storageLayer
+        ))
 
-        httpApp = Router[Task](
-          "/echo" -> echoApi.routes,
-          "/storage" -> storageApi.routes
+        httpApp = Router[AppTask](
+          "/api/graphql" -> CORS(Http4sAdapter.makeHttpService(interpreter))
         ).orNotFound
 
         server <- ZIO.runtime[ZEnv].flatMap { implicit rts =>
-          BlazeServerBuilder[Task]
+          BlazeServerBuilder[AppTask]
             .bindHttp(api.port, api.endpoint)
-            .withHttpApp(CORS(httpApp))
+            .withHttpApp(httpApp)
 //            .withResponseHeaderTimeout(FiniteDuration.apply(30, TimeUnit.SECONDS))
             .withResponseHeaderTimeout(Duration.Inf)
             .withIdleTimeout(FiniteDuration.apply(30, TimeUnit.SECONDS))
