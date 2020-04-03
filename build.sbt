@@ -8,7 +8,8 @@ lazy val root = (project in file("."))
   .settings(
     name := "zio-examples",
     scalacOptions := Seq(
-        "-Ymacro-annotations"
+        "-Ymacro-annotations",
+        "-language:higherKinds", // Allow higher-kinded types
     ),
     libraryDependencies ++= zio,
     libraryDependencies ++= Seq(zioCats),
@@ -16,8 +17,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= doobie,
     libraryDependencies ++= Seq(h2),
     libraryDependencies ++= http4s,
-    libraryDependencies ++= tapir,  //not used in the project yet
-    libraryDependencies ++= circeModules,
+    libraryDependencies ++= circe,
     libraryDependencies ++= aws,
     libraryDependencies ++= Seq(pureConfig),
     libraryDependencies ++= typeHelpers,

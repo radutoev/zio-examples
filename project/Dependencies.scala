@@ -12,7 +12,7 @@ object Dependencies {
   val H2Version = "1.4.199"
   val RefinedVersion = "0.9.13"
   val NewTypesVersion = "0.4.3"
-  val CirceRefinedVersion = "0.13.0"
+  val CirceVersion = "0.13.0"
   val AwsVersion = "2.11.2"
 
   lazy val zio = Seq(
@@ -30,9 +30,12 @@ object Dependencies {
     "org.http4s" %% "http4s-circe" % Http4sVersion,
     "org.http4s" %% "http4s-dsl" % Http4sVersion)
 
-  lazy val circeModules = Seq(
-    "io.circe" %% "circe-refined" % CirceRefinedVersion,
-    "io.circe" %% "circe-generic-extras" % CirceRefinedVersion
+  lazy val circe = Seq(
+    "io.circe" %% "circe-core" % CirceVersion,
+    "io.circe" %% "circe-generic" % CirceVersion,
+    "io.circe" %% "circe-parser" % CirceVersion,
+    "io.circe" %% "circe-refined" % CirceVersion,
+    "io.circe" %% "circe-generic-extras" % CirceVersion
   )
 
   lazy val tapir = Seq("com.softwaremill.sttp.tapir" %% "tapir-core" % TapirVersion,
