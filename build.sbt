@@ -17,6 +17,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= doobie,
     libraryDependencies ++= Seq(h2),
     libraryDependencies ++= http4s,
+    libraryDependencies ++= caliban,
     libraryDependencies ++= circe,
     libraryDependencies ++= aws,
     libraryDependencies ++= Seq(pureConfig),

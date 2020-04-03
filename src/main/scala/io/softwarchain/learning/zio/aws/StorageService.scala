@@ -17,7 +17,7 @@ import scala.jdk.CollectionConverters._
 final class StorageService(s3AsyncClient: S3AsyncClient) extends Storage.Service {
   private val logger = logLocally(LogAnnotation.Name("StorageService" :: Nil))(ZIO.unit)
 
-  override def buckets(): ZIO[Logging with Auth, Throwable, List[String]] = {
+  override def buckets(): ZIO[Logging with Auth, Throwable, List[domain.Bucket]] = {
     for {
       user              <- auth.userInfo()
       _                 <- logger *> logInfo(s"User ${user.email} is fetching buckets")
@@ -32,7 +32,7 @@ final class StorageService(s3AsyncClient: S3AsyncClient) extends Storage.Service
 
   private val responseToBuckets: ListBucketsResponse => List[Bucket] = response => response.buckets().asScala.toList
 
-  private val bucketName: Bucket => String = b => b.name()
+  private val bucketName: Bucket => domain.Bucket = b => domain.Bucket(b.name())
 }
 
 object StorageService {

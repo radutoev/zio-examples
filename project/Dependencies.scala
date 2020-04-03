@@ -14,6 +14,7 @@ object Dependencies {
   val NewTypesVersion = "0.4.3"
   val CirceVersion = "0.13.0"
   val AwsVersion = "2.11.2"
+  val CalibanVersion = "0.7.3"
 
   lazy val zio = Seq(
     "dev.zio" %% "zio" % ZioVersion,
@@ -55,6 +56,11 @@ object Dependencies {
 
   lazy val aws = Seq(
     "software.amazon.awssdk" % "s3" % AwsVersion
+  )
+
+  lazy val caliban = Seq(
+    "com.github.ghostdogpr" %% "caliban" % CalibanVersion,
+    "com.github.ghostdogpr" %% "caliban-http4s" % CalibanVersion
   )
 
   /**
