@@ -9,6 +9,8 @@ final class EchoService extends Echo.Service {
     logLocally(LogAnnotation.Name("EchoService" :: Nil)) {
       logInfo(s"Echoing $message")
     }.flatMap(_ => ZIO.succeed(message))
+
+  override def fail(message: Message): ZIO[Logging, EchoError, Message] = ZIO.fail(EchoError("Well shit"))
 }
 
 object EchoService {

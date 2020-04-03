@@ -9,7 +9,8 @@ import zio.logging.Logging
 
 object EchoGql extends GenericSchema[Echo with Logging] {
   case class Queries(
-    echo: Message => ZIO[Echo with Logging, EchoError, Message]
+    echo: Message => ZIO[Echo with Logging, EchoError, Message],
+    fail: Message => ZIO[Echo with Logging, EchoError, Message]
   )
 
   implicit val messageSchema: EchoGql.Typeclass[Message] = gen[Message]
@@ -18,7 +19,8 @@ object EchoGql extends GenericSchema[Echo with Logging] {
     graphQL(
       RootResolver(
         Queries(
-          args => echo(Message(args.message))
+          args => echo(Message(args.message)),
+          args => fail(args)
         )
       )
     )
