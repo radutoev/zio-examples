@@ -1,7 +1,6 @@
 package io.softwarchain.learning.zio.configuration
 
 import pureconfig.ConfigSource
-import eu.timepit.refined.pureconfig._
 import pureconfig.generic.auto._
 import zio.{Has, Layer, Task, ZLayer}
 

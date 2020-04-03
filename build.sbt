@@ -8,7 +8,8 @@ lazy val root = (project in file("."))
   .settings(
     name := "zio-examples",
     scalacOptions := Seq(
-        "-Ymacro-annotations"
+        "-Ymacro-annotations",
+        "-language:higherKinds", // Allow higher-kinded types
     ),
     libraryDependencies ++= zio,
     libraryDependencies ++= Seq(zioCats),
